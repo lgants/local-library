@@ -20,6 +20,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+// use the Express.static middleware to get Express to serve all the static files in the directory /public
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
