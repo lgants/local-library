@@ -1,4 +1,4 @@
-Random Notes:
+Notes:
 
 All callbacks in Mongoose use the pattern callback(error, result). If an error occurs executing the query, the error parameter will contain an error document, and result will be null. If the query is successful, the error parameter will be null, and the result will be populated with the results of the query
 
