@@ -4,11 +4,24 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
+
+// database setup
+mongoose.Promise = global.Promise;
+if (process.env.NODE_ENV !== 'test'){
+  mongoose.connect('mongodb://localhost/local-library');
+}
+
+//Get the default database Connection object
+var database = mongoose.connection;
+
+//Bind connection to error event (to get notification of connection errors)
+database.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
