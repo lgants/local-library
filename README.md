@@ -120,3 +120,91 @@ You can also perform loop/iteration operations using each-in or while syntax. In
 ul
   each val in [1, 2, 3, 4, 5]
     li= val
+
+
+
+A Promise object is created using the new keyword and its constructor. This constructor takes as its argument a function, called the "executor function". This function should take two functions as parameters. The first of these functions (resolve) is called when the asynchronous task completes successfully and returns the results of the task as a value. The second (reject) is called when the task fails, and returns the reason for failure, which is typically an error object.
+
+const myFirstPromise = new Promise((resolve, reject) => {
+  // do something asynchronous which eventually calls either:
+  //
+  //   resolve(someValue); // fulfilled
+  // or
+  //   reject("failure reason"); // rejected
+});
+
+To provide a function with promise functionality, simply have it return a promise:
+
+function myAsyncFunction(url) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", url);
+    xhr.onload = () => resolve(xhr.responseText);
+    xhr.onerror = () => reject(xhr.statusText);
+    xhr.send();
+  });
+});
+
+let myPromise = new Promise((resolve, reject) => {
+  // We call resolve(...) when what we were doing made async successful, and reject(...) when it failed.
+  // In this example, we use setTimeout(...) to simulate async code.
+  // In reality, you will probably be using something like XHR or an HTML5 API.
+  setTimeout(function(){
+    resolve("Success!"); // Yay! Everything went well!
+  }, 250);
+});
+
+myPromise.then((successMessage) => {
+  // successMessage is whatever we passed in the resolve(...) function above.
+  // It doesn't have to be a string, but if it is only a succeed message, it probably will be.
+  console.log("Yay! " + successMessage);
+});
+
+
+This small example shows the mechanism of a Promise. The testPromise() method is called each time the <button> is clicked. It creates a promise that will be fulfilled, using window.setTimeout(), to the promise count (number starting from 1) every 1-3 seconds, at random. The Promise() constructor is used to create the promise.
+
+The fulfillment of the promise is simply logged, via a fulfill callback set using p1.then(). A few logs show how the synchronous part of the method is decoupled from the asynchronous completion of the promise.
+
+'use strict';
+var promiseCount = 0;
+
+function testPromise() {
+    let thisPromiseCount = ++promiseCount;
+
+    let log = document.getElementById('log');
+    log.insertAdjacentHTML('beforeend', thisPromiseCount +
+        ') Started (<small>Sync code started</small>)<br/>');
+
+    // We make a new promise: we promise a numeric count of this promise, starting from 1 (after waiting 3s)
+    let p1 = new Promise(
+        // The resolver function is called with the ability to resolve or
+        // reject the promise
+       (resolve, reject) => {
+            log.insertAdjacentHTML('beforeend', thisPromiseCount +
+                ') Promise started (<small>Async code started</small>)<br/>');
+            // This is only an example to create asynchronism
+            window.setTimeout(
+                function() {
+                    // We fulfill the promise !
+                    resolve(thisPromiseCount);
+                }, Math.random() * 2000 + 1000);
+        }
+    );
+
+    // We define what to do when the promise is resolved/rejected with the then() call,
+    // and the catch() method defines what to do if the promise is rejected.
+    p1.then(
+        // Log the fulfillment value
+        function(val) {
+            log.insertAdjacentHTML('beforeend', val +
+                ') Promise fulfilled (<small>Async code terminated</small>)<br/>');
+        })
+    .catch(
+        // Log the rejection reason
+       (reason) => {
+            console.log('Handle rejected promise ('+reason+') here.');
+        });
+
+    log.insertAdjacentHTML('beforeend', thisPromiseCount +
+        ') Promise made (<small>Sync code terminated</small>)<br/>');
+}
